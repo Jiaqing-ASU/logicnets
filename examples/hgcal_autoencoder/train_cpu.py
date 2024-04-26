@@ -179,9 +179,9 @@ def main(args):
         print(f"Encoder LUTCost = {encoder_lut_cost}")
 
      # Push model and constants to GPU if necessary
-    if args.gpu:
-        model.cuda()
-        move_constants_to_gpu()
+    # if args.gpu:
+    #     model.cuda()
+    #     move_constants_to_gpu()
 
     # Train
     if args.train:
@@ -284,8 +284,11 @@ def main(args):
             pin_memory=True,
             shuffle=False, 
         )
+        # test_loss, avg_emd = test(
+        #     model, test_loader, val_sum, args.gpu, compute_emd=True,
+        # )
         test_loss, avg_emd = test(
-            model, test_loader, val_sum, args.gpu, compute_emd=True,
+            model, test_loader, val_sum, False, compute_emd=True,
         )
         eval_tag = "_eval" if args.evaluate else ""
         os.makedirs(experiment_dir, exist_ok=True)
