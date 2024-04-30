@@ -15,12 +15,34 @@
 
 import os
 import time
+import copy
 import yaml
 import torch
 import random
 import datetime
 import numpy as np
 from tqdm import tqdm
+import matplotlib
+import matplotlib.pyplot as plt
+
+from telescope_pt import telescopeMSE8x8
+
+from pyhessian import hessian
+from loss_landscapes_pinn import *
+from loss_landscapes_pinn.metrics import *
+
+def get_params(model_orig,  model_perb, direction, alpha):
+    for m_orig, m_perb, d in zip(model_orig.parameters(), model_perb.parameters(), direction):
+        # print("m_orig: ", m_orig.data.shape)
+        # print("m_perb: ", m_perb.data.shape)
+        # print("d: ", d.shape)
+        # print("alpha: ", alpha)
+        # try:
+        if m_orig.data.shape == d.shape and m_perb.data.shape == d.shape:
+            m_perb.data = m_orig.data + alpha * d
+        # except:
+        #     pass
+    return model_perb
 
 from argparse import ArgumentParser
 
@@ -287,19 +309,116 @@ def main(args):
         # test_loss, avg_emd = test(
         #     model, test_loader, val_sum, args.gpu, compute_emd=True,
         # )
-        test_loss, avg_emd = test(
-            model, test_loader, val_sum, False, compute_emd=True,
+        # test_loss, avg_emd = test(
+        #     model, test_loader, val_sum, False, compute_emd=True,
+        # )
+        # eval_tag = "_eval" if args.evaluate else ""
+        # os.makedirs(experiment_dir, exist_ok=True)
+        # test_results_log = os.path.join(
+        #     experiment_dir, 
+        #     args.experiment_name \
+        #     + f"_loss={test_loss:.3f}" + eval_tag + "_emd.txt"
+        # )
+        # with open(test_results_log, "w") as f:
+        #     f.write(str(avg_emd))
+        #     f.close()
+
+        ###############################################################################
+        # Calculate the Hessian loss
+        ###############################################################################
+
+        criterion = telescopeMSE8x8
+        # criterion = torch.nn.CrossEntropyLoss()
+
+        train_loader = torch.utils.data.DataLoader(
+            dataset["train"], 
+            num_workers=args.num_workers,
+            batch_size=config["batch_size"], 
+            pin_memory=True,
+            shuffle=False, 
         )
-        eval_tag = "_eval" if args.evaluate else ""
-        os.makedirs(experiment_dir, exist_ok=True)
-        test_results_log = os.path.join(
-            experiment_dir, 
-            args.experiment_name \
-            + f"_loss={test_loss:.3f}" + eval_tag + "_emd.txt"
-        )
-        with open(test_results_log, "w") as f:
-            f.write(str(avg_emd))
-            f.close()
+
+        for x in train_loader:
+            break
+        inputs, targets = x, x
+        
+        model.eval()
+        model_perb = copy.deepcopy(model)
+        model_perb.eval()
+        model_current = copy.deepcopy(model)
+        model_current.eval()
+
+        POINTS = 1681
+        STEPS = 41
+        DIM = 2
+        START = -0.1
+        END = 0.1
+
+        # Generate the loss values array using BFS
+        # Create a coordinate array for loss values
+        loss_coordinates_list = []
+        pbar = tqdm(total=POINTS, desc="Generating 2-D coordinates in the subspace")
+        for i in range(STEPS):
+            for j in range(STEPS):
+                t = (i,j)
+                loss_coordinates_list.append(t)
+                pbar.update(1)
+        pbar.close()
+        loss_coordinates = np.array(loss_coordinates_list)
+        print(loss_coordinates.shape)
+        
+        # Create a data matrix to store loss values
+        data_matrix = np.empty([POINTS, 1], dtype=float)
+        # Fill array with initial value (e.g., -1)
+        data_matrix.fill(-1)
+        # print(data_matrix)
+        print(data_matrix.shape)
+        
+        # calculate the hessian eigenvalues and eigenvectors
+        hessian_comp = hessian(model, criterion, data=(inputs, targets), cuda=False)
+        top_eigenvalues, top_eigenvector = hessian_comp.eigenvalues(top_n=DIM)
+        print("Top eigenvalues: ", top_eigenvalues)
+        lams = np.linspace(START, END, STEPS).astype(np.float32)
+        
+        # calculate the hessian loss values
+        for j in tqdm(range(POINTS), desc="Calculating sampling loss values in the subspace"):
+            # adjust the model and fill with a loss with corresponding model parameters
+            next_pos = tuple(loss_coordinates[j])
+            model_current = copy.deepcopy(model)
+            for i in range(DIM):
+                # print("Next position: ", next_pos[i])
+                # print("lams: ", lams[next_pos[i]])
+                # print("Top eigenvector: ", top_eigenvector[i])
+                model_perb = get_params(model_current, model_perb, top_eigenvector[i], lams[next_pos[i]])
+                model_current = copy.deepcopy(model_perb)
+            model_current.eval()
+            # calculate the loss valu
+            inputs_hat = model_current(inputs)
+            loss = criterion(inputs_hat, targets)
+            data_matrix[j] = loss.item()
+            # print("Loss value: ", data_matrix[j])
+        
+        # save the loss values
+        np.save('loss_landscapes/' + str(args.experiment_name) + '_hessian_loss_landscape.npy', data_matrix)
+        
+        # plot the loss values
+        X, Y = np.meshgrid(np.linspace(START, END, STEPS), np.linspace(START, END, STEPS))
+        Z = data_matrix.reshape(STEPS, STEPS)
+        fig, ax = plt.subplots()
+        ax.contour(X, Y, Z, levels=80)
+        plt.title('Hessian Loss landscape of the model')
+        plt.savefig('loss_landscapes/' + str(args.experiment_name) + '_hessian_loss_landscape.png')
+
+        ###############################################################################
+        # Calculate the random loss
+        ###############################################################################
+
+        # for inputs in train_loader:
+        #     break
+        # outputs = model(inputs)
+        # metric = Loss(criterion, inputs, outputs)
+        # directions = random_n_dirctions_pinn(model, metric, dim=2, distance=10, steps=10, normalization='model', deepcopy_model=True)
+        # print("Directions: ", directions)
 
 
 
