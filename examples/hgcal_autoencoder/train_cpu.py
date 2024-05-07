@@ -23,6 +23,7 @@ import datetime
 import numpy as np
 from tqdm import tqdm
 import matplotlib
+from matplotlib import cm
 import matplotlib.pyplot as plt
 
 from telescope_pt import telescopeMSE8x8
@@ -398,6 +399,11 @@ def main(args):
             data_matrix[j] = loss.item()
             # print("Loss value: ", data_matrix[j])
         
+
+        ###############################################################################
+        # Save the loss values and plot the loss landscape
+        ###############################################################################
+
         # save the loss values
         np.save('loss_landscapes/' + str(args.experiment_name) + '_hessian_loss_landscape.npy', data_matrix)
         
@@ -406,21 +412,31 @@ def main(args):
         Z = data_matrix.reshape(STEPS, STEPS)
         fig, ax = plt.subplots()
         ax.contour(X, Y, Z, levels=80)
-        plt.title('Hessian Loss landscape of the model')
+        plt.title('Hessian Loss landscape contour of the model')
         plt.savefig('loss_landscapes/' + str(args.experiment_name) + '_hessian_loss_landscape.png')
 
-        ###############################################################################
-        # Calculate the random loss
-        ###############################################################################
-
-        # for inputs in train_loader:
-        #     break
-        # outputs = model(inputs)
-        # metric = Loss(criterion, inputs, outputs)
-        # directions = random_n_dirctions_pinn(model, metric, dim=2, distance=10, steps=10, normalization='model', deepcopy_model=True)
-        # print("Directions: ", directions)
-
-
+        # plot the 2D loss values in 3D
+        fig = plt.figure()
+        ax = plt.axes(projection='3d')
+        X = np.array([[j for j in range(STEPS)] for i in range(STEPS)])
+        Y = np.array([[i for _ in range(STEPS)] for i in range(STEPS)])
+        data_matrix_reshape = data_matrix.reshape(STEPS, STEPS)
+        ax.plot_surface(X, Y, data_matrix_reshape, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+        
+        cset = ax.contourf(X, Y, data_matrix_reshape, zdir='z', offset=3, cmap=cm.coolwarm)
+        cset = ax.contourf(X, Y, data_matrix_reshape, zdir='x', offset=40, cmap=cm.coolwarm)
+        cset = ax.contourf(X, Y, data_matrix_reshape, zdir='y', offset=0, cmap=cm.coolwarm)
+        
+        ax.set_xlabel('X')
+        ax.set_xlim(0, STEPS)
+        ax.set_ylabel('Y')
+        ax.set_ylim(0, STEPS)
+        ax.set_zlabel('loss_data_fin')
+        ax.set_zlim(min(data_matrix), max(data_matrix))
+        ax.set_title('Hessian Loss landscape surface of the model')
+        
+        # save plot to file and show
+        plt.savefig('loss_landscapes/' + str(args.experiment_name) + '_hessian_loss_landscape_surface.png')
 
 if __name__ == "__main__":
     parser = ArgumentParser()
