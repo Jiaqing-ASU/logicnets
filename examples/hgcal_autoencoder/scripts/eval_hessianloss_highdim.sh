@@ -24,7 +24,7 @@ EXP_NAME=small_pareto_model_best_loss
 CONFIG=./pareto_configs/small_pareto_model/small_pareto_model.yml
 CKPT=./pareto_configs/small_pareto_model/small_pareto_model_best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -38,7 +38,7 @@ EXP_NAME=medium_pareto_model_best_loss
 CONFIG=./pareto_configs/medium_pareto_model/medium_pareto_model.yml
 CKPT=./pareto_configs/medium_pareto_model/medium_pareto_model_best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -52,7 +52,7 @@ EXP_NAME=large_pareto_model_best_loss
 CONFIG=./pareto_configs/large_pareto_model/large_pareto_model.yml
 CKPT=./pareto_configs/large_pareto_model/large_pareto_model_best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -66,7 +66,7 @@ EXP_NAME=weak1_pareto_model_best_loss
 CONFIG=./pareto_configs/weak1_pareto_model/weak1_pareto_model.yml
 CKPT=./pareto_configs/weak1_pareto_model/weak1_pareto_model_best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -80,7 +80,7 @@ EXP_NAME=weak2_pareto_model_best_loss
 CONFIG=./pareto_configs/weak2_pareto_model/weak2_pareto_model.yml
 CKPT=./pareto_configs/weak2_pareto_model/weak2_pareto_model_best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -94,7 +94,7 @@ EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size2_se
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size2_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size2_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -108,7 +108,7 @@ EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size2_se
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size2_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size2_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -122,7 +122,7 @@ EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size4_se
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size4_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size4_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -136,7 +136,7 @@ EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size4_se
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size4_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size4_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -150,7 +150,7 @@ EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size4_se
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size4_seed963241121/hparams.yml
 CKPT=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size4_seed963241121/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -164,7 +164,7 @@ EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size8_se
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size8_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size8_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -178,7 +178,7 @@ EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size8_se
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size8_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size8_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -192,7 +192,7 @@ EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size16_s
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size16_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size16_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -206,7 +206,7 @@ EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size16_s
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size16_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size16_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -220,7 +220,7 @@ EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size16_s
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size16_seed963241121/hparams.yml
 CKPT=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size16_seed963241121/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -234,7 +234,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size2_
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size2_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size2_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -248,7 +248,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size2_
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size2_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size2_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -262,7 +262,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size4_
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size4_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size4_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -276,7 +276,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size4_
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size4_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size4_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -290,7 +290,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size4_
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size4_seed524926359/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size4_seed524926359/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -304,7 +304,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size8_
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size8_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size8_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -318,7 +318,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size8_
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size8_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size8_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -332,7 +332,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size16
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size16_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size16_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -346,7 +346,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size16
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size16_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size16_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -360,7 +360,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size16
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size16_seed524926359/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size16_seed524926359/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -374,7 +374,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size32
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size32_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size32_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -388,7 +388,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size32
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size32_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size32_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -402,7 +402,7 @@ EXP_NAME=medium_averaging_fixed_mask_averaging_medium_fixed_mask_ensemble_size32
 CONFIG=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size32_seed524926359/hparams.yml
 CKPT=./averaging_fixed_mask_configs/medium_averaging_fixed_mask/averaging_medium_fixed_mask_ensemble_size32_seed524926359/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -416,7 +416,7 @@ EXP_NAME=large_averaging_fixed_mask_averaging_large_fixed_mask_ensemble_size2_se
 CONFIG=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size2_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size2_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -430,7 +430,7 @@ EXP_NAME=large_averaging_fixed_mask_averaging_large_fixed_mask_ensemble_size2_se
 CONFIG=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size2_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size2_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -444,7 +444,7 @@ EXP_NAME=large_averaging_fixed_mask_averaging_large_fixed_mask_ensemble_size4_se
 CONFIG=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size4_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size4_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -458,7 +458,7 @@ EXP_NAME=large_averaging_fixed_mask_averaging_large_fixed_mask_ensemble_size4_se
 CONFIG=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size4_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size4_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -472,7 +472,7 @@ EXP_NAME=large_averaging_fixed_mask_averaging_large_fixed_mask_ensemble_size8_se
 CONFIG=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size8_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size8_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -486,7 +486,7 @@ EXP_NAME=large_averaging_fixed_mask_averaging_large_fixed_mask_ensemble_size8_se
 CONFIG=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size8_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size8_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -500,7 +500,7 @@ EXP_NAME=large_averaging_fixed_mask_averaging_large_fixed_mask_ensemble_size16_s
 CONFIG=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size16_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size16_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -514,7 +514,7 @@ EXP_NAME=large_averaging_fixed_mask_averaging_large_fixed_mask_ensemble_size16_s
 CONFIG=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size16_seed2/hparams.yml
 CKPT=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size16_seed2/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -528,7 +528,7 @@ EXP_NAME=large_averaging_fixed_mask_averaging_large_fixed_mask_ensemble_size16_s
 CONFIG=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size16_seed432384445/hparams.yml
 CKPT=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size16_seed432384445/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
@@ -542,7 +542,7 @@ EXP_NAME=large_averaging_fixed_mask_averaging_large_fixed_mask_ensemble_size32_s
 CONFIG=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size32_seed1/hparams.yml
 CKPT=./averaging_fixed_mask_configs/large_averaging_fixed_mask/averaging_large_fixed_mask_ensemble_size32_seed1/best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 train_cpu.py \
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu_highdim.py \
     --data_dir $DATA_DIR \
     --data_file $DATA_FILE \
     --save_dir $SAVE_DIR \
