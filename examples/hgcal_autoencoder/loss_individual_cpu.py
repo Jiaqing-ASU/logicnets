@@ -152,6 +152,8 @@ def main(args):
         # Ensemble learning
         ensemble_method = config["ensemble_method"]
         ensemble_size = config["ensemble_size"]
+        print(f"Ensemble method: {ensemble_method}")
+        print(f"Ensemble size: {ensemble_size}")
         if ensemble_method == "voting":
             if "ensemble_hp" in config.keys():
                 fixed_sparsity_mask = config["ensemble_hp"]["fixed_sparsity_mask"]
@@ -329,6 +331,7 @@ def main(args):
         # Calculate the Hessian loss
         ###############################################################################
 
+        # criterion = telescopeMSE8x8_individual
         criterion = telescopeMSE8x8
         # criterion = torch.nn.CrossEntropyLoss()
 
@@ -369,27 +372,37 @@ def main(args):
         data_matrix.fill(-1)
         # print(data_matrix)
         print(data_matrix.shape)
+        
+        # make the model a copy of the original model
+        model_experiment = copy.deepcopy(model)
+        model_experiment.eval()
 
         # extract individual ensemble member checkpoints
         individual_checkpoints = model.encoder_ensemble
         individual_checkpoint = EncoderNeqModel(config, input_length=64, output_length=16)
+        print("Number of individual checkpoints: ", len(individual_checkpoints))
         for k in range(len(individual_checkpoints)):
             # print("Individual checkpoint: ", individual_checkpoint)
             # Load the checkpoint
             individual_checkpoint = individual_checkpoints[k]
-            individual_checkpoint.load_state_dict(individual_checkpoint.state_dict())
-            individual_checkpoint.eval()
+            # individual_checkpoint.load_state_dict(individual_checkpoint.state_dict())
+            # individual_checkpoint.eval()
+
+            model_experiment.encoder_ensemble = torch.nn.ModuleList()
+            encoder = copy.deepcopy(individual_checkpoint)
+            model_experiment.encoder_ensemble.append(encoder)
+            model_experiment.eval()
 
             # make two copies of the model
-            model_perb = EncoderNeqModel(config, input_length=64, output_length=16)
-            model_perb.load_state_dict(individual_checkpoint.state_dict())
+            model_perb = copy.deepcopy(model_experiment)
             model_perb.eval()
-            model_current = EncoderNeqModel(config, input_length=64, output_length=16)
-            model_current.load_state_dict(individual_checkpoint.state_dict())
+            model_current = copy.deepcopy(model_experiment)
             model_current.eval()
-            
+
             # calculate the hessian eigenvalues and eigenvectors
-            hessian_comp = hessian(individual_checkpoint, criterion, data=(inputs, targets), cuda=False)
+            # print("Shape of inputs: ", inputs.shape)
+            # print("Shape of targets: ", targets.shape)
+            hessian_comp = hessian(model_experiment, criterion, data=(inputs, targets), cuda=False)
             top_eigenvalues, top_eigenvector = hessian_comp.eigenvalues(top_n=DIM)
             print("Top eigenvalues: ", top_eigenvalues)
             lams = np.linspace(START, END, STEPS).astype(np.float32)
@@ -411,7 +424,6 @@ def main(args):
                 loss = criterion(inputs_hat, targets)
                 data_matrix[j] = loss.item()
                 # print("Loss value: ", data_matrix[j])
-            
 
             ###############################################################################
             # Save the loss values and plot the loss landscape

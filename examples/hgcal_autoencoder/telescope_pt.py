@@ -161,6 +161,51 @@ def telescopeMSE2(y_true, y_pred, reduction=True):
 
     return 4 * loss_tc1.mean() + 2 * loss_tc2.mean() + loss_tc3.mean()
 
+# def telescopeMSE2_individual(y_true, y_pred, reduction=True):
+#     y_true = y_true.to(dtype=y_pred.dtype)
+
+#     # TC-level MSE
+#     y_pred_rs = torch.reshape(y_pred, (-1, 48))
+#     y_true_rs = torch.reshape(y_true, (-1, 48))
+
+#     y_pred_rs_size = y_pred_rs.size(dim=0)
+#     y_true_rs_size = y_true_rs.size(dim=0)
+#     min_size = min(y_pred_rs_size, y_true_rs_size)
+    
+#     y_pred_rs = y_pred_rs.split(min_size)[0]
+#     y_true_rs = y_true_rs.split(min_size)[0]
+
+#     # print("Shape of y_pred_rs: ", y_pred_rs.shape)
+#     # print("Shape of y_true_rs: ", y_true_rs.shape)
+    
+#     loss_tc1 = torch.mean(
+#         torch.square(y_true_rs - y_pred_rs) * torch.max(y_pred_rs, y_true_rs),
+#         dim=-1,
+#     )
+
+#     # map TCs to 2x2 supercells and compute MSE
+#     y_pred_36 = torch.matmul(y_pred_rs, Remap_48_36)
+#     y_true_36 = torch.matmul(y_true_rs, Remap_48_36)
+#     loss_tc2 = torch.mean(
+#         torch.square(y_true_36 - y_pred_36)
+#         * torch.max(y_pred_36, y_true_36)
+#         * Weights_48_36,
+#         dim=-1,
+#     )
+
+#     # map 2x2 supercells to 4x4 supercells and compute MSE
+#     y_pred_12 = torch.matmul(y_pred_rs, Remap_48_12)
+#     y_true_12 = torch.matmul(y_true_rs, Remap_48_12)
+#     y_pred_3 = torch.matmul(y_pred_12, Remap_12_3)
+#     y_true_3 = torch.matmul(y_true_12, Remap_12_3)
+#     loss_tc3 = torch.mean(
+#         torch.square(y_true_3 - y_pred_3) * torch.max(y_pred_3, y_true_3), dim=-1
+#     )
+#     if not reduction:
+#         return 4 * loss_tc1 + 2 * loss_tc2 + loss_tc3
+
+#     return 4 * loss_tc1.mean() + 2 * loss_tc2.mean() + loss_tc3.mean()
+
 
 remap_8x8 = [
     4,
@@ -244,3 +289,11 @@ def telescopeMSE8x8(y_true, y_pred, reduction=True):
         torch.matmul(torch.reshape(y_pred, (-1, 64)), remap_8x8_matrix),
         reduction=reduction,
     )
+
+# def telescopeMSE8x8_individual(y_true, y_pred, reduction=True):
+#     y_true = y_true.to(dtype=y_pred.dtype)
+#     return telescopeMSE2_individual(
+#         torch.matmul(torch.reshape(y_true, (-1, 64)), remap_8x8_matrix),
+#         torch.matmul(torch.reshape(y_pred, (-1, 64)), remap_8x8_matrix),
+#         reduction=reduction,
+#     )
