@@ -20,75 +20,75 @@ DATA_DIR=./data/hgcal22data_signal_driven_ttbar_v11/nElinks_5/
 DATA_FILE=./data/hgcal22data_signal_driven_ttbar_v11/hgcal22data_signal_driven_ttbar_v11_nELinks5.npy 
 SAVE_DIR=./test
 
-EXP_NAME=small_pareto_model_best_loss
-CONFIG=./pareto_configs/small_pareto_model/small_pareto_model.yml
-CKPT=./pareto_configs/small_pareto_model/small_pareto_model_best_loss.pth
+# EXP_NAME=small_pareto_model_best_loss
+# CONFIG=./pareto_configs/small_pareto_model/small_pareto_model.yml
+# CKPT=./pareto_configs/small_pareto_model/small_pareto_model_best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
-    --data_dir $DATA_DIR \
-    --data_file $DATA_FILE \
-    --save_dir $SAVE_DIR \
-    --experiment_name $EXP_NAME \
-    --evaluate \
-    --checkpoint $CKPT \
-    --gpu \
-    --hparams_config $CONFIG
+# CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
+#     --data_dir $DATA_DIR \
+#     --data_file $DATA_FILE \
+#     --save_dir $SAVE_DIR \
+#     --experiment_name $EXP_NAME \
+#     --evaluate \
+#     --checkpoint $CKPT \
+#     --gpu \
+#     --hparams_config $CONFIG
 
-EXP_NAME=medium_pareto_model_best_loss
-CONFIG=./pareto_configs/medium_pareto_model/medium_pareto_model.yml
-CKPT=./pareto_configs/medium_pareto_model/medium_pareto_model_best_loss.pth
+# EXP_NAME=medium_pareto_model_best_loss
+# CONFIG=./pareto_configs/medium_pareto_model/medium_pareto_model.yml
+# CKPT=./pareto_configs/medium_pareto_model/medium_pareto_model_best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
-    --data_dir $DATA_DIR \
-    --data_file $DATA_FILE \
-    --save_dir $SAVE_DIR \
-    --experiment_name $EXP_NAME \
-    --evaluate \
-    --checkpoint $CKPT \
-    --gpu \
-    --hparams_config $CONFIG
+# CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
+#     --data_dir $DATA_DIR \
+#     --data_file $DATA_FILE \
+#     --save_dir $SAVE_DIR \
+#     --experiment_name $EXP_NAME \
+#     --evaluate \
+#     --checkpoint $CKPT \
+#     --gpu \
+#     --hparams_config $CONFIG
 
-EXP_NAME=large_pareto_model_best_loss
-CONFIG=./pareto_configs/large_pareto_model/large_pareto_model.yml
-CKPT=./pareto_configs/large_pareto_model/large_pareto_model_best_loss.pth
+# EXP_NAME=large_pareto_model_best_loss
+# CONFIG=./pareto_configs/large_pareto_model/large_pareto_model.yml
+# CKPT=./pareto_configs/large_pareto_model/large_pareto_model_best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
-    --data_dir $DATA_DIR \
-    --data_file $DATA_FILE \
-    --save_dir $SAVE_DIR \
-    --experiment_name $EXP_NAME \
-    --evaluate \
-    --checkpoint $CKPT \
-    --gpu \
-    --hparams_config $CONFIG
+# CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
+#     --data_dir $DATA_DIR \
+#     --data_file $DATA_FILE \
+#     --save_dir $SAVE_DIR \
+#     --experiment_name $EXP_NAME \
+#     --evaluate \
+#     --checkpoint $CKPT \
+#     --gpu \
+#     --hparams_config $CONFIG
 
-EXP_NAME=weak1_pareto_model_best_loss
-CONFIG=./pareto_configs/weak1_pareto_model/weak1_pareto_model.yml
-CKPT=./pareto_configs/weak1_pareto_model/weak1_pareto_model_best_loss.pth
+# EXP_NAME=weak1_pareto_model_best_loss
+# CONFIG=./pareto_configs/weak1_pareto_model/weak1_pareto_model.yml
+# CKPT=./pareto_configs/weak1_pareto_model/weak1_pareto_model_best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
-    --data_dir $DATA_DIR \
-    --data_file $DATA_FILE \
-    --save_dir $SAVE_DIR \
-    --experiment_name $EXP_NAME \
-    --evaluate \
-    --checkpoint $CKPT \
-    --gpu \
-    --hparams_config $CONFIG
+# CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
+#     --data_dir $DATA_DIR \
+#     --data_file $DATA_FILE \
+#     --save_dir $SAVE_DIR \
+#     --experiment_name $EXP_NAME \
+#     --evaluate \
+#     --checkpoint $CKPT \
+#     --gpu \
+#     --hparams_config $CONFIG
 
-EXP_NAME=weak2_pareto_model_best_loss
-CONFIG=./pareto_configs/weak2_pareto_model/weak2_pareto_model.yml
-CKPT=./pareto_configs/weak2_pareto_model/weak2_pareto_model_best_loss.pth
+# EXP_NAME=weak2_pareto_model_best_loss
+# CONFIG=./pareto_configs/weak2_pareto_model/weak2_pareto_model.yml
+# CKPT=./pareto_configs/weak2_pareto_model/weak2_pareto_model_best_loss.pth
 
-CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
-    --data_dir $DATA_DIR \
-    --data_file $DATA_FILE \
-    --save_dir $SAVE_DIR \
-    --experiment_name $EXP_NAME \
-    --evaluate \
-    --checkpoint $CKPT \
-    --gpu \
-    --hparams_config $CONFIG
+# CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
+#     --data_dir $DATA_DIR \
+#     --data_file $DATA_FILE \
+#     --save_dir $SAVE_DIR \
+#     --experiment_name $EXP_NAME \
+#     --evaluate \
+#     --checkpoint $CKPT \
+#     --gpu \
+#     --hparams_config $CONFIG
 
 EXP_NAME=small_averaging_fixed_mask_averaging_small_fixed_mask_ensemble_size2_seed1
 CONFIG=./averaging_fixed_mask_configs/small_averaging_fixed_mask/averaging_small_fixed_mask_ensemble_size2_seed1/hparams.yml
