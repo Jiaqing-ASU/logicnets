@@ -428,13 +428,14 @@ def main(args):
             individual_checkpoint = individual_checkpoints[k]
             individual_checkpoint.load_state_dict(individual_checkpoint.state_dict())
             individual_checkpoint.eval()
+            models.append(individual_checkpoint)
 
-            model_experiment.encoder_ensemble = torch.nn.ModuleList()
-            encoder = copy.deepcopy(individual_checkpoint)
-            model_experiment.encoder_ensemble.append(encoder)
-            model_experiment.eval()
+            # model_experiment.encoder_ensemble = torch.nn.ModuleList()
+            # encoder = copy.deepcopy(individual_checkpoint)
+            # model_experiment.encoder_ensemble.append(encoder)
+            # model_experiment.eval()
 
-            models.append(model_experiment)
+            # models.append(model_experiment)
 
         print("Number of individual models: ", len(models))
 
@@ -466,22 +467,26 @@ def main(args):
 
         # define (N-1) global directions 
         for i, w_i in enumerate(weights[1:], start=1):
-            
+
             # subtract w_0 from w_i
             v_i = w_i - weights[0]
             v_i_orig = copy.deepcopy(v_i)
-            
+            print(f"v_i_orig: {np.shape(v_i_orig)}")
+            print("v_i_orig: ", v_i_orig[:30])
+
             # make orthogonal to other directions
             for v_j in global_directions:
                 v_i = v_i - np.dot(v_j, v_i) * v_j
+            print(f"v_i: {np.shape(v_i)}")
+            print("v_i: ", v_i[:30])
 
             # # compare v_i before and after making it orthogonal
             print(f"{np.linalg.norm(v_i_orig - v_i)=}")
             print(f"{np.dot(v_i_orig, v_i)=}")
-            
+
             # normalize
-            # v_i_norm = np.linalg.norm(v_i)
-            v_i_norm = 1.0
+            v_i_norm = np.linalg.norm(v_i)
+            # v_i_norm = 1.0
             v_i /= v_i_norm
 
             # store directions and norms
@@ -522,8 +527,8 @@ def main(args):
         distance_box = []
         for i in range(len(current_coords)):
             left_right_distance = max([_[i] for _ in model_coords]) - min([_[i] for _ in model_coords])
-            left_border = min([_[i] for _ in model_coords]) - args.box_size * left_right_distance - 0.1
-            right_border = max([_[i] for _ in model_coords]) + args.box_size * left_right_distance + 0.1
+            left_border = min([_[i] for _ in model_coords]) - args.box_size * left_right_distance
+            right_border = max([_[i] for _ in model_coords]) + args.box_size * left_right_distance
             print(f"Direction {i}: {left_border} to {right_border}")
             distance_box.append((left_border, right_border))
         print(f"Distance box: {distance_box}")
@@ -620,21 +625,7 @@ def main(args):
             distance_matrix_list.append("{:.2f}".format(distance))
         distance_matrix = np.asarray(distance_matrix_list)
         print("Distance matrix: ", distance_matrix.shape)
-
-        ###############################################################################
-        # Calculate the loss values of loading models
-        ###############################################################################
-
-        loss_values_loading = []
-        this_model = copy.deepcopy(models[0])
-        for i in range(len(models)):
-            inputs_hat = models[i](inputs)
-            loss = criterion(inputs_hat, targets)
-            loss_values_loading.append(loss)
-            
-        for i in range(len(loss_values_loading)):
-            print(f"Loss value at {i}th loading model: {loss_values_loading[i]}")
-
+        
         ###############################################################################
         # Evaluate the loss along points on the grid
         ###############################################################################
@@ -667,7 +658,11 @@ def main(args):
                 model_current = copy.deepcopy(model_perb)
             
             # compute the loss for the current model
-            inputs_hat = model_current(inputs)
+            model_experiment.encoder_ensemble = torch.nn.ModuleList()
+            encoder = copy.deepcopy(model_current)
+            model_experiment.encoder_ensemble.append(encoder)
+            model_experiment.eval()
+            inputs_hat = model_experiment(inputs)
             loss = criterion(inputs_hat, targets)
         
             # if j < len(model_coords):
