@@ -507,8 +507,20 @@ def main(args):
         print(f"Done unflattening {len(global_directions)} global directions")
         for i, v_i in enumerate(global_directions):
             print(f"{i} // {len(v_i)}")
+        
+        ###############################################################################
+        # Fix the dimensions
+        ###############################################################################
+        DIM = args.dim
+        if len(global_directions) < 2:
+            exit("Error: Number of global directions is less than 2. Exiting...")
+        if DIM > len(global_directions):
+            print(f"Warning: DIM={DIM} is larger than the number of global directions. Setting DIM to {len(global_directions)}")
+            DIM = len(global_directions)
 
-        # compute coordinates of the loaded models
+        ###############################################################################
+        # Compute coordinates of the loaded models
+        ###############################################################################
         model_coords = []
 
         for i, w in enumerate(weights):
@@ -532,14 +544,6 @@ def main(args):
             print(f"Direction {i}: {left_border} to {right_border}")
             distance_box.append((left_border, right_border))
         print(f"Distance box: {distance_box}")
-
-        # fix the dimension if the required dimension is larger than the number of models
-        DIM = args.dim
-        if DIM > len(global_directions):
-            print(f"Warning: DIM={DIM} is larger than the number of global directions. Setting DIM to {len(global_directions)}")
-            DIM = len(global_directions)
-
-        # model_names = [f"{_}" for _ in args.seeds]
 
         ###############################################################################
         # Get initial model
@@ -691,12 +695,6 @@ def main(args):
             x = loss_coordinates[:, 0]
             y = loss_coordinates[:, 1]
             plt.scatter(x, y, c=loss_values, cmap='viridis')
-            # if args.plot == "loss":
-            #     for i, txt in enumerate(data_matrix):
-            #         plt.annotate("{:.2f}".format(txt[0]), (x[i], y[i]))
-            # elif args.plot == "distance":
-            #     for i, txt in enumerate(distance_matrix):
-            #         plt.annotate(txt, (x[i], y[i]))
             plt.colorbar()
             for i in range(len(model_coords)):
                 x_ = model_coords[i][0]
@@ -711,33 +709,99 @@ def main(args):
             plt.clf()
 
         if DIM == 3 and args.visualize:
-            x = loss_coordinates[:, 0]
-            y = loss_coordinates[:, 1]
-            z = loss_coordinates[:, 2]
+            ###############################################################################
+            # Calculate the full loss cubes with fixed step sizes
+            ###############################################################################
+            STEPS = args.steps
+
+            lams_x = np.linspace(distance_box[0][0], distance_box[0][1], STEPS)
+            lams_y = np.linspace(distance_box[1][0], distance_box[1][1], STEPS)
+            lams_z = np.linspace(distance_box[2][0], distance_box[2][1], STEPS)
+
+            full_cube_coordinates = []
+            for i in range(STEPS):
+                for j in range(STEPS):
+                    for k in range(STEPS):
+                        t = (lams_x[i], lams_y[j], lams_z[k])
+                        full_cube_coordinates.append(t)
+
+            full_cube_coordinates = np.asarray(full_cube_coordinates)
+            print("Generated full cube coordinates: ", full_cube_coordinates.shape)
+
+            # calculate the loss values
+            full_cube_matrix = np.empty([STEPS**DIM, 1], dtype=float)
+            full_cube_matrix.fill(-1)
+
+            # make the model a copy
+            model_init = copy.deepcopy(models[0])
+            model_init.eval()
+            # make the model another copy
+            model_perb = copy.deepcopy(model_init)
+            model_perb.eval()
+
+            # calculate the loss values
+            for j in tqdm(range(STEPS**DIM), desc="Calculating sampling loss values in the full cube"):
+                # adjust the model and fill with a loss with corresponding model parameters
+                next_pos = tuple(loss_coordinates[j])
+                model_current = copy.deepcopy(model_init)
+                for i in range(DIM):
+                    global_direction = global_directions[i]
+                    model_perb = get_params(model_current, model_perb, global_direction, next_pos[i])
+                    model_current = copy.deepcopy(model_perb)
+
+                # compute the loss for the current model
+                model_experiment.encoder_ensemble = torch.nn.ModuleList()
+                encoder = copy.deepcopy(model_current)
+                model_experiment.encoder_ensemble.append(encoder)
+                model_experiment.eval()
+                inputs_hat = model_experiment(inputs)
+                loss = criterion(inputs_hat, targets)
+                # print(f"Loss value at coordinate {j}: {loss}")
+                full_cube_matrix[j] = loss.detach().numpy()
+
+            ###############################################################################
+            # Save scatter plot of the full cube
+            ###############################################################################
+
+            x = full_cube_coordinates[:, 0]
+            y = full_cube_coordinates[:, 1]
+            z = full_cube_coordinates[:, 2]
+
+            print(f"Generated full cube coordinates: {x.shape}, {y.shape}, {z.shape}")
+            print(f"Generated full cube loss values: {full_cube_matrix.shape}")
+
             fig = plt.figure(figsize = (10, 7))
             ax = plt.axes(projection ="3d")
-            ax.scatter3D(x, y, z, c=loss_values, cmap= "viridis")
-            # plt.colorbar()
-            for i in range(len(model_coords)):
-                x_ = model_coords[i][0]
-                y_ = model_coords[i][1]
-                z_ = model_coords[i][2]
-                loss_ = loss_values[i]
-                plt.scatter(x_, y_, z_, c='red')
-            
+            ax.scatter3D(x, y, z, c=full_cube_matrix, cmap= "viridis")
+
             plt.title(f'Global Loss landscape')
-            plt.savefig('loss_landscapes_global/' + str(args.experiment_name) + '_hessian_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.png')
+            plt.savefig('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.png')
             if args.show_plots:
                 plt.show()
             plt.clf()
+
+            ###############################################################################
+            # Save the full cube results
+            ###############################################################################
+
+            # save the loss values
+            np.save('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.npy', full_cube_matrix.ravel())
+            # save the coordinates
+            np.save('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}_coords.npy', full_cube_coordinates)
+            # save the loss with its corresponding model coordinates into a json
+            with open('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.json', "w") as f:
+                json.dump({"loss_values": full_cube_matrix.tolist(), "loss_coordinates": full_cube_coordinates.tolist()}, f)
         
+        ###############################################################################
+        # Save the sampling cube results
+        ###############################################################################
         # save the loss values
         np.save('loss_landscapes_global/' + str(args.experiment_name) + '_hessian_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.npy', data_matrix.ravel())
         # save the coordinates
         np.save('loss_landscapes_global/' + str(args.experiment_name) + '_hessian_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}_coords.npy', loss_coordinates)
         # save the loss with its corresponding model coordinates into a json
         with open('loss_landscapes_global/' + str(args.experiment_name) + '_hessian_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.json', "w") as f:
-            json.dump({"loss_values": data_matrix.tolist(), "loss_coordinates": loss_coordinates.tolist()}, f)
+            json.dump({"loss_values": data_matrix.tolist(), "loss_coordinates": loss_coordinates.tolist(), "numbers of models": len(models)}, f)
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -766,7 +830,8 @@ if __name__ == "__main__":
     parser.add_argument('--visualize', type=bool, default=True, help='Visualize the solution.')
     parser.add_argument('--show-plots', default=False, help='Visualize the solution.')
     parser.add_argument('--box-size', default=1.0, type=float, help='Size of the box to visualize.')
-    parser.add_argument('--dim', default=2, help='dimension for hessian loss values calculation')
+    parser.add_argument('--dim', default=3, help='dimension for hessian loss values calculation')
+    parser.add_argument('--steps', default=50, help='steps for hessian loss values calculation')
     parser.add_argument('--points', default=5000, help='total points while sampling for hessian loss values calculation')
     parser.add_argument('--vmax-pct', type=float, default=30, help='Clamp values above this percentile when visualizing')
     args = parser.parse_args()
