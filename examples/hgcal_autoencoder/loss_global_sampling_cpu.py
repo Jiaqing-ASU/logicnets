@@ -742,7 +742,7 @@ def main(args):
             # calculate the loss values
             for j in tqdm(range(STEPS**DIM), desc="Calculating sampling loss values in the full cube"):
                 # adjust the model and fill with a loss with corresponding model parameters
-                next_pos = tuple(loss_coordinates[j])
+                next_pos = tuple(full_cube_coordinates[j])
                 model_current = copy.deepcopy(model_init)
                 for i in range(DIM):
                     global_direction = global_directions[i]
@@ -775,7 +775,7 @@ def main(args):
             ax.scatter3D(x, y, z, c=full_cube_matrix, cmap= "viridis")
 
             plt.title(f'Global Loss landscape')
-            plt.savefig('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.png')
+            plt.savefig('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_steps{STEPS}.png')
             if args.show_plots:
                 plt.show()
             plt.clf()
@@ -785,11 +785,11 @@ def main(args):
             ###############################################################################
 
             # save the loss values
-            np.save('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.npy', full_cube_matrix.ravel())
+            np.save('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_steps{STEPS}.npy', full_cube_matrix.ravel())
             # save the coordinates
-            np.save('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}_coords.npy', full_cube_coordinates)
+            np.save('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_steps{STEPS}_coords.npy', full_cube_coordinates)
             # save the loss with its corresponding model coordinates into a json
-            with open('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.json', "w") as f:
+            with open('loss_landscapes_global_3D/' + str(args.experiment_name) + '_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_steps{STEPS}.json', "w") as f:
                 json.dump({"loss_values": full_cube_matrix.tolist(), "loss_coordinates": full_cube_coordinates.tolist()}, f)
         
         ###############################################################################
