@@ -512,8 +512,8 @@ def main(args):
         # Fix the dimensions
         ###############################################################################
         DIM = args.dim
-        if len(global_directions) < 2:
-            exit("Error: Number of global directions is less than 2. Exiting...")
+        if len(global_directions) < args.dimfilter:
+            exit("Error: Number of global directions is less than the filter dimension. Exiting...")
         if DIM > len(global_directions):
             print(f"Warning: DIM={DIM} is larger than the number of global directions. Setting DIM to {len(global_directions)}")
             DIM = len(global_directions)
@@ -815,24 +815,15 @@ if __name__ == "__main__":
     parser.add_argument("--gpu", action="store_true", default=False)
     parser.add_argument("--train", action="store_true", default=False)
     parser.add_argument("--evaluate", action="store_true", default=False)
-    parser.add_argument(
-        "--hparams_config", 
-        type=str, 
-        default=None, 
-        help="yaml containing hyperparameters for building and training a model"
-    )
-    parser.add_argument(
-        "--checkpoint", 
-        type=str, 
-        default=None, 
-        help="model checkpoint"
-    )
+    parser.add_argument("--hparams_config", type=str, default=None, help="yaml containing hyperparameters for building and training a model")
+    parser.add_argument("--checkpoint", type=str, default=None, help="model checkpoint")
     parser.add_argument('--visualize', type=bool, default=True, help='Visualize the solution.')
     parser.add_argument('--show-plots', default=False, help='Visualize the solution.')
     parser.add_argument('--box-size', default=1.0, type=float, help='Size of the box to visualize.')
-    parser.add_argument('--dim', default=3, help='dimension for hessian loss values calculation')
+    parser.add_argument('--dim', default=31, help='dimension for hessian loss values calculation')
+    parser.add_argument('--dimfilter', default=31, help='dimension for hessian loss values calculation')
     parser.add_argument('--steps', default=50, help='steps for hessian loss values calculation')
-    parser.add_argument('--points', default=5000, help='total points while sampling for hessian loss values calculation')
+    parser.add_argument('--points', default=50000, help='total points while sampling for hessian loss values calculation')
     parser.add_argument('--vmax-pct', type=float, default=30, help='Clamp values above this percentile when visualizing')
     args = parser.parse_args()
     main(args)
