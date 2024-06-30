@@ -823,7 +823,7 @@ if __name__ == "__main__":
     parser.add_argument('--dim', default=31, help='dimension for hessian loss values calculation')
     parser.add_argument('--dimfilter', default=31, help='dimension for hessian loss values calculation')
     parser.add_argument('--steps', default=50, help='steps for hessian loss values calculation')
-    parser.add_argument('--points', default=50000, help='total points while sampling for hessian loss values calculation')
+    parser.add_argument('--points', default=20000, help='total points while sampling for hessian loss values calculation')
     parser.add_argument('--vmax-pct', type=float, default=30, help='Clamp values above this percentile when visualizing')
     args = parser.parse_args()
     main(args)
