@@ -1,5 +1,5 @@
 ensemble_method: adaboost
-ensemble_size: 2
+ensemble_size: 4
 hidden_layers:
 - 64
 - 32
@@ -18,3 +18,4 @@ learning_rate: 0.001
 seed: 2
 checkpoint: null
 quantize_avg: false
+post_transform_output: True
