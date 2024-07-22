@@ -418,10 +418,16 @@ def main(args):
         model_experiment.eval()
 
         # extract individual ensemble member checkpoints
+        DIM = args.dim
         models = []
         individual_checkpoints = model.encoder_ensemble
         individual_checkpoint = EncoderNeqModel(config, input_length=64, output_length=16)
         print("Number of individual checkpoints: ", len(individual_checkpoints))
+        if DIM > len(individual_checkpoints) - 1:
+            print(f"Warning: DIM={DIM} is larger than the number of individual checkpoints. Only using {len(individual_checkpoints) - 1} checkpoints.")
+        
+        individual_checkpoints = individual_checkpoints[:DIM + 1]
+        
         for k in range(len(individual_checkpoints)):
             # print("Individual checkpoint: ", individual_checkpoint)
             # Load the checkpoint
@@ -511,7 +517,7 @@ def main(args):
         ###############################################################################
         # Fix the dimensions
         ###############################################################################
-        DIM = args.dim
+        
         if len(global_directions) < args.dimfilter:
             exit("Error: Number of global directions is less than the filter dimension. Exiting...")
         if DIM > len(global_directions):
@@ -820,10 +826,10 @@ if __name__ == "__main__":
     parser.add_argument('--visualize', type=bool, default=True, help='Visualize the solution.')
     parser.add_argument('--show-plots', default=False, help='Visualize the solution.')
     parser.add_argument('--box-size', default=1.0, type=float, help='Size of the box to visualize.')
-    parser.add_argument('--dim', default=31, help='dimension for hessian loss values calculation')
-    parser.add_argument('--dimfilter', default=31, help='dimension for hessian loss values calculation')
+    parser.add_argument('--dim', default=2, help='dimension for hessian loss values calculation')
+    parser.add_argument('--dimfilter', default=2, help='dimension for hessian loss values calculation')
     parser.add_argument('--steps', default=50, help='steps for hessian loss values calculation')
-    parser.add_argument('--points', default=20000, help='total points while sampling for hessian loss values calculation')
+    parser.add_argument('--points', default=5000, help='total points while sampling for hessian loss values calculation')
     parser.add_argument('--vmax-pct', type=float, default=30, help='Clamp values above this percentile when visualizing')
     args = parser.parse_args()
     main(args)
