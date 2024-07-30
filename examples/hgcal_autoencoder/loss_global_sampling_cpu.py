@@ -394,7 +394,7 @@ def main(args):
         #     f.close()
 
         ###############################################################################
-        # Calculate the Hessian loss
+        # Calculate the loss
         ###############################################################################
 
         criterion = telescopeMSE8x8
@@ -411,16 +411,21 @@ def main(args):
         for x in train_loader:
             break
         inputs, targets = x, x
-
-        # # make the model a copy of the original model
+        
         model.eval()
         model_experiment = copy.deepcopy(model)
         model_experiment.eval()
+        model_original = copy.deepcopy(model)
+        model_original.eval()
+
+        # hessian_comp = hessian(model, criterion, data=(inputs, targets), cuda=False)
+        # top_eigenvalues, top_eigenvector = hessian_comp.eigenvalues(top_n=5)
+        # print("Top eigenvalues: ", top_eigenvalues)
 
         # extract individual ensemble member checkpoints
         DIM = args.dim
         models = []
-        individual_checkpoints = model.encoder_ensemble
+        individual_checkpoints = model_original.encoder_ensemble
         individual_checkpoint = EncoderNeqModel(config, input_length=64, output_length=16)
         print("Number of individual checkpoints: ", len(individual_checkpoints))
         if DIM > len(individual_checkpoints) - 1:
@@ -452,9 +457,9 @@ def main(args):
         # collect weights and make sure we are appending weights correctly
         weight_dicts = []
         weights = []
-        for i, model in enumerate(models):
+        for i, model_ in enumerate(models):
             # {"params": flat, "indices": indices}
-            weight_dict = flatten_params(model.parameters(), return_params=True)
+            weight_dict = flatten_params(model_.parameters(), return_params=True)
             w_flat = weight_dict['flat'].detach().cpu().numpy().ravel()
             
             weight_dicts.append(weight_dict)
@@ -651,6 +656,7 @@ def main(args):
 
         # Create a data matrix to store loss values
         data_matrix = np.empty([POINTS, 1], dtype=float)
+        # hessian_list = []
 
         # Fill array with initial value (e.g., -1)
         data_matrix.fill(-1)
@@ -678,6 +684,12 @@ def main(args):
             # if j < len(model_coords):
                 # print(f"Loss value at {j}th model: {loss}")
             data_matrix[j] = loss.detach().numpy()
+
+            # calculate the hessian
+            # hessian_comp = hessian(model, criterion, data=(inputs, targets), cuda=False)
+            # top_eigenvalues, top_eigenvector = hessian_comp.eigenvalues(top_n=5)
+            # print("Top eigenvalues: ", top_eigenvalues)
+            # hessian_list.append(top_eigenvalues)
 
         ###############################################################################
         # Fix the loss values
@@ -805,6 +817,8 @@ def main(args):
         np.save('loss_landscapes_global/' + str(args.experiment_name) + '_hessian_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.npy', data_matrix.ravel())
         # save the coordinates
         np.save('loss_landscapes_global/' + str(args.experiment_name) + '_hessian_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}_coords.npy', loss_coordinates)
+        # # save the hessian eigenvalues
+        # np.save('loss_landscapes_global/' + str(args.experiment_name) + '_hessian_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}_hessian.npy', np.array(hessian_list))
         # save the loss with its corresponding model coordinates into a json
         with open('loss_landscapes_global/' + str(args.experiment_name) + '_hessian_loss_landscape_' + f'boxsize{args.box_size}_max_pct{args.vmax_pct}_dim{DIM}_points{POINTS}.json', "w") as f:
             json.dump({"loss_values": data_matrix.tolist(), "loss_coordinates": loss_coordinates.tolist(), "numbers of models": len(models)}, f)
