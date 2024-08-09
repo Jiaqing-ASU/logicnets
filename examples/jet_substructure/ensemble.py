@@ -20,17 +20,33 @@ class AveragingJetNeqModel(nn.Module):
         self.model_config = model_config
         self.num_models = num_models
         self.quantize_avg = quantize_avg
+        self.same_output_scale = model_config["same_output_scale"]
         self.ensemble = nn.ModuleList(
             [JetSubstructureNeqModel(model_config) for _ in range(num_models)]
         )
         self.is_verilog_inference = False
-        if quantize_avg:
+        if quantize_avg: # For packing averaging into a LUT
             self.avg_quant = QuantBrevitasActivation(
                 QuantIdentity(
                     bit_width=model_config["output_bitwidth"],
                     quant_type=QuantType.INT,
                 )
             )
+        if self.same_output_scale:
+            # FOR DEBUGGING: Print output quantizer for each ensemble member
+            # print("BEFORE: Output quantizer for each ensemble member:")
+            # for model in self.ensemble:
+            #     print(f"\t{hex(id(model.module_list[-1].output_quant))}")
+            # Set all ensemble member's output quantizer to be the same as the
+            # first model's output quantizer
+            for model in self.ensemble[1:]:
+                model.module_list[-1].output_quant = self.ensemble[0].module_list[-1].output_quant
+            # FOR DEBUGGING: Print output quantizer for each ensemble member
+            # print("AFTER: Output quantizer for each ensemble member:")
+            # for model in self.ensemble:
+            #     print(f"\t{hex(id(model.module_list[-1].output_quant))}")
+
+
 
     def forward(self, x):
         if self.is_verilog_inference:
@@ -40,7 +56,7 @@ class AveragingJetNeqModel(nn.Module):
     def pytorch_forward(self, x):
         outputs = torch.stack([model(x) for model in self.ensemble], dim=0)
         outputs = outputs.mean(dim=0)
-        if self.quantize_avg:
+        if self.quantize_avg: # For packing averaging into a LUT
             outputs = self.avg_quant(outputs)
         return outputs
 
@@ -186,10 +202,6 @@ class AdaBoostJetNeqModel(BaseEnsembleClassifier):
         # self.alphas = torch.tensor([])  # Accuracy measures for each model
         self.register_buffer("alphas", torch.tensor([]))
         # AdaBoost multi-class "one-hot" encoding
-        # self.adaboost_labels = (
-        #     torch.ones(num_classes, num_classes) * -1 / (num_classes - 1)
-        # )
-        # self.adaboost_labels[torch.eye(num_classes) == 1] = 1  # Set diagonal to 1
         adaboost_labels = (
             torch.ones(num_classes, num_classes) * -1 / (num_classes - 1)
         )
