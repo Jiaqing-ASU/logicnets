@@ -3,3 +3,6 @@ data/
 **/averaging/**/*.pth
 **/bagging/**/*.pth
 **/test_runs/**/*.pth
+
+# Large Jet Substructure Classification checkpoints
+model_ckpts/
