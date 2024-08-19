@@ -184,6 +184,47 @@ def main(args):
         with open(test_results_log, "w") as f:
             f.write(str(test_accuracy))
             f.close()
+        
+        # test individual models in ensemble
+        if "ensemble_method" in config:
+            if config["ensemble_method"] == "averaging":
+                print("Averaging ensemble method")
+                ensemble_ckpt_list = model.ensemble
+                count = 0
+                for model in ensemble_ckpt_list:
+                    count += 1
+                    model = model.to("cpu")
+                    test_accuracy, test_avg_roc_auc, test_loss = test(model, test_loader, args.cuda)
+                    print(f"Test Accuracy of model {count}: {test_accuracy:.2f}%")
+                    print(f"Test loss of model {count}: {test_loss:.3f}")
+            elif config["ensemble_method"] == "bagging":
+                print("Bagging ensemble method")
+                ensemble_ckpt_list = model.ensemble
+                count = 0
+                for model in ensemble_ckpt_list:
+                    count += 1
+                    model = model.to("cpu")
+                    test_accuracy, test_avg_roc_auc, test_loss = test(model, test_loader, args.cuda)
+                    print(f"Test Accuracy of model {count}: {test_accuracy:.2f}%")
+                    print(f"Test loss of model {count}: {test_loss:.3f}")
+            elif config["ensemble_method"] == "adaboost":
+                print("AdaBoost ensemble method")
+                ensemble_ckpt_list = model.ensemble
+                count = 0
+                for model in ensemble_ckpt_list:
+                    count += 1
+                    model = model.to("cpu")
+                    test_accuracy, test_avg_roc_auc, test_loss = test(model, test_loader, args.cuda)
+                    print(f"Test Accuracy of model {count}: {test_accuracy:.2f}%")
+                    print(f"Test loss of model {count}: {test_loss:.3f}")
+            else:
+                raise ValueError(f"Unknown ensemble method: {config['ensemble_method']}")
+        else:  # Single model learning
+            print("Single model learning")
+            model = model.to("cpu")
+            test_accuracy, test_avg_roc_auc, test_loss = test(model, test_loader, args.cuda)
+            print(f"Test Accuracy: {test_accuracy:.2f}%")
+            print(f"Test loss: {test_loss:.3f}")
 
 
 if __name__ == "__main__":
