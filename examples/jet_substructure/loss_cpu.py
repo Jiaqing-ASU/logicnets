@@ -14,15 +14,18 @@
 
 import os
 import yaml
+import joypy
 from argparse import ArgumentParser
 import random
 
 import numpy as np
+import pandas as pd
+import seaborn as sns
 
 import torch
 from torch.utils.data import DataLoader
 
-from training_methods import train, test, train_bagging, train_adaboost
+from training_methods import train, test, train_bagging, train_adaboost, test_predictions_return
 
 from dataset import JetSubstructureDataset
 from models import JetSubstructureNeqModel
@@ -194,9 +197,14 @@ def main(args):
                 for model in ensemble_ckpt_list:
                     count += 1
                     model = model.to("cpu")
-                    test_accuracy, test_avg_roc_auc, test_loss = test(model, test_loader, args.cuda)
+                    test_accuracy, test_avg_roc_auc, test_loss, prob, pred, target_label = test_predictions_return(model, test_loader, args.cuda)
                     print(f"Test Accuracy of model {count}: {test_accuracy:.2f}%")
                     print(f"Test loss of model {count}: {test_loss:.3f}")
+                    # save the predictions into dataframe
+                    df = pd.DataFrame(prob)
+                    df['pred'] = pred
+                    df['target_label'] = target_label
+                    df.to_csv(os.path.join(experiment_dir, f"model_{count}_predictions.csv"), index=False)
             elif config["ensemble_method"] == "bagging":
                 print("Bagging ensemble method")
                 ensemble_ckpt_list = model.ensemble
@@ -204,9 +212,14 @@ def main(args):
                 for model in ensemble_ckpt_list:
                     count += 1
                     model = model.to("cpu")
-                    test_accuracy, test_avg_roc_auc, test_loss = test(model, test_loader, args.cuda)
+                    test_accuracy, test_avg_roc_auc, test_loss, prob, pred, target_label = test_predictions_return(model, test_loader, args.cuda)
                     print(f"Test Accuracy of model {count}: {test_accuracy:.2f}%")
                     print(f"Test loss of model {count}: {test_loss:.3f}")
+                    # save the predictions into dataframe
+                    df = pd.DataFrame(prob)
+                    df['pred'] = pred
+                    df['target_label'] = target_label
+                    df.to_csv(os.path.join(experiment_dir, f"model_{count}_predictions.csv"), index=False)
             elif config["ensemble_method"] == "adaboost":
                 print("AdaBoost ensemble method")
                 ensemble_ckpt_list = model.ensemble
@@ -214,17 +227,27 @@ def main(args):
                 for model in ensemble_ckpt_list:
                     count += 1
                     model = model.to("cpu")
-                    test_accuracy, test_avg_roc_auc, test_loss = test(model, test_loader, args.cuda)
+                    test_accuracy, test_avg_roc_auc, test_loss, prob, pred, target_label = test_predictions_return(model, test_loader, args.cuda)
                     print(f"Test Accuracy of model {count}: {test_accuracy:.2f}%")
                     print(f"Test loss of model {count}: {test_loss:.3f}")
+                    # save the predictions into dataframe
+                    df = pd.DataFrame(prob)
+                    df['pred'] = pred
+                    df['target_label'] = target_label
+                    df.to_csv(os.path.join(experiment_dir, f"model_{count}_predictions.csv"), index=False)
             else:
                 raise ValueError(f"Unknown ensemble method: {config['ensemble_method']}")
         else:  # Single model learning
             print("Single model learning")
             model = model.to("cpu")
-            test_accuracy, test_avg_roc_auc, test_loss = test(model, test_loader, args.cuda)
+            test_accuracy, test_avg_roc_auc, test_loss, prob, pred, target_label = test_predictions_return(model, test_loader, args.cuda)
             print(f"Test Accuracy: {test_accuracy:.2f}%")
             print(f"Test loss: {test_loss:.3f}")
+            # save the predictions into dataframe
+            df = pd.DataFrame(prob)
+            df['pred'] = pred
+            df['target_label'] = target_label
+            df.to_csv(os.path.join(experiment_dir, f"model_{count}_predictions.csv"), index=False)
 
 
 if __name__ == "__main__":

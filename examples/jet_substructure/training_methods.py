@@ -54,6 +54,44 @@ def test(model, dataset_loader, cuda):
         return accuracy, avg_roc_auc, accLoss
 
 
+def test_predictions_return(model, dataset_loader, cuda):
+    # Configure criterion
+    criterion = nn.CrossEntropyLoss()
+    with torch.no_grad():
+        model.eval()
+        entire_prob = None
+        golden_ref = None
+        correct = 0
+        accLoss = 0.0
+        for batch_idx, (data, target) in enumerate(dataset_loader):
+            if cuda:
+                data, target = data.cuda(), target.cuda()
+            output = model(data)
+            loss = criterion(output, torch.max(target, 1)[1])
+            accLoss += loss.detach() * len(data)
+            prob = F.softmax(output, dim=1)
+            pred = output.detach().max(1, keepdim=True)[1]
+            target_label = torch.max(target.detach(), 1, keepdim=True)[1]
+            curCorrect = pred.eq(target_label).long().sum()
+            curAcc = 100.0 * curCorrect / len(data)
+            correct += curCorrect
+            if batch_idx == 0:
+                entire_prob = prob
+                golden_ref = target_label
+            else:
+                entire_prob = torch.cat((entire_prob, prob), dim=0)
+                golden_ref = torch.cat((golden_ref, target_label))
+        accLoss /= len(dataset_loader.dataset)
+        accuracy = 100 * float(correct) / len(dataset_loader.dataset)
+        avg_roc_auc = roc_auc_score(
+            golden_ref.detach().cpu().numpy(),
+            entire_prob.detach().cpu().numpy(),
+            average="macro",
+            multi_class="ovr",
+        )
+        return accuracy, avg_roc_auc, accLoss, prob, pred, target_label
+
+
 def train(model, datasets, config, cuda=False, log_dir="./jsc", sampler=None):
     # Create data loaders for training and inference:
     if sampler:  # Use the provided sampler
