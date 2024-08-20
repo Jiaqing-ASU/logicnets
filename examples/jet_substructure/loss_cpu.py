@@ -111,7 +111,7 @@ def main(args):
     if args.checkpoint is not None:
         print(f"Loading pre-trained checkpoint {args.checkpoint}")
         checkpoint = torch.load(args.checkpoint, map_location="cpu")
-        model.load_state_dict(checkpoint["model_dict"])
+        model.load_state_dict(checkpoint["model_dict"], strict=False)
 
     print(f"Model: {model.__class__.__name__}")
 
@@ -139,7 +139,7 @@ def main(args):
             evaluate_model = True
             print(f"Evaluating model saved at: {args.checkpoint}")
             checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
-            model.load_state_dict(checkpoint["model_dict"])
+            model.load_state_dict(checkpoint["model_dict"], strict=False)
             if (
                 config["ensemble_method"] in ENSEMBLING_METHODS
                 and config["ensemble_method"] != "averaging"
@@ -174,9 +174,10 @@ def main(args):
         )
         test_accuracy, test_avg_roc_auc, test_loss = test(model, test_loader, args.cuda)
         eval_tag = "_eval" if args.evaluate else ""
+        ensemble_method = config["ensemble_method"] if "ensemble_method" in config else "single"
         os.makedirs(experiment_dir, exist_ok=True)
         test_results_log = os.path.join(
-            experiment_dir,
+            experiment_dir + f"/{ensemble_method}/",
             args.experiment_name
             + f"_loss={test_loss:.3f}"
             + eval_tag
@@ -204,7 +205,7 @@ def main(args):
                     df = pd.DataFrame(prob)
                     df['pred'] = pred
                     df['target_label'] = target_label
-                    df.to_csv(os.path.join(experiment_dir, f"model_{count}_predictions.csv"), index=False)
+                    df.to_csv(os.path.join(experiment_dir, f"averaging/{args.model_name}_model_{count}_predictions.csv"), index=False)
             elif config["ensemble_method"] == "bagging":
                 print("Bagging ensemble method")
                 ensemble_ckpt_list = model.ensemble
@@ -219,7 +220,7 @@ def main(args):
                     df = pd.DataFrame(prob)
                     df['pred'] = pred
                     df['target_label'] = target_label
-                    df.to_csv(os.path.join(experiment_dir, f"model_{count}_predictions.csv"), index=False)
+                    df.to_csv(os.path.join(experiment_dir, f"bagging/{args.model_name}_model_{count}_predictions.csv"), index=False)
             elif config["ensemble_method"] == "adaboost":
                 print("AdaBoost ensemble method")
                 ensemble_ckpt_list = model.ensemble
@@ -234,7 +235,7 @@ def main(args):
                     df = pd.DataFrame(prob)
                     df['pred'] = pred
                     df['target_label'] = target_label
-                    df.to_csv(os.path.join(experiment_dir, f"model_{count}_predictions.csv"), index=False)
+                    df.to_csv(os.path.join(experiment_dir, f"adaboost/{args.model_name}_model_{count}_predictions.csv"), index=False)
             else:
                 raise ValueError(f"Unknown ensemble method: {config['ensemble_method']}")
         else:  # Single model learning
@@ -247,7 +248,7 @@ def main(args):
             df = pd.DataFrame(prob)
             df['pred'] = pred
             df['target_label'] = target_label
-            df.to_csv(os.path.join(experiment_dir, f"model_{count}_predictions.csv"), index=False)
+            df.to_csv(os.path.join(experiment_dir, f"single/{args.model_name}_model_{count}_predictions.csv"), index=False)
 
 
 if __name__ == "__main__":
@@ -287,6 +288,12 @@ if __name__ == "__main__":
         type=str,
         default=None,
         help="Path to a YAML file containing the model configuration",
+    )
+    parser.add_argument(
+        "--model_name",
+        type=str,
+        default="adaboost_large_ensemble_size32",
+        help="The name of the model to train",
     )
 
     args = parser.parse_args()

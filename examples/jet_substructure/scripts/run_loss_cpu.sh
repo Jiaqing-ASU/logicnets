@@ -16,21 +16,35 @@
 
 CUDA_DEVICE=$1
 
-# SAVE_DIR=./test
-# EXP_NAME=adaboost_large_ensemble_size32
+
+MODEL_NAME=adaboost_large_ensemble_size32
 CONFIG=./model_ckpts/jet_substructure/adaboost/adaboost_large_ensemble_size32/hparams.yml
 CKPT=./model_ckpts/jet_substructure/adaboost/adaboost_large_ensemble_size32/last_ensemble_ckpt.pth
-
-
-# CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
-#     --cuda \
-#     --evaluate \
-#     --checkpoint $CKPT \
-#     --config $CONFIG \
-#     --save_dir $SAVE_DIR \
-#     --experiment_name $EXP_NAME
 
 CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
     --evaluate \
     --checkpoint $CKPT \
-    --config $CONFIG
+    --config $CONFIG \
+    --model_name $MODEL_NAME
+
+
+MODEL_NAME=averaging_large_ensemble_size16
+CONFIG=./model_ckpts/jet_substructure/averaging/averaging_large_ensemble_size16/hparams.yml
+CKPT=./model_ckpts/jet_substructure/averaging/averaging_large_ensemble_size16/best_accuracy.pth
+
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
+    --evaluate \
+    --checkpoint $CKPT \
+    --config $CONFIG \
+    --model_name $MODEL_NAME
+
+
+MODEL_NAME=bagging_large_ensemble_size32
+CONFIG=./model_ckpts/jet_substructure/bagging/bagging_large_ensemble_size32/hparams.yml
+CKPT=./model_ckpts/jet_substructure/bagging/bagging_large_ensemble_size32/last_ensemble_ckpt.pth
+
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 loss_cpu.py \
+    --evaluate \
+    --checkpoint $CKPT \
+    --config $CONFIG \
+    --model_name $MODEL_NAME
