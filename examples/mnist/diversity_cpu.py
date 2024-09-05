@@ -263,7 +263,7 @@ def main(args):
                 for model in ensemble_ckpt_list:
                     count += 1
                     model = model.to("cpu")
-                    test_accuracy, test_loss, pred, prob, target_label = test_predictions_return(model, dataloaders["test"], args.cuda)
+                    test_accuracy, test_loss, pred, prob, target_label = test_predictions_return(model, dataloaders["valid"], args.cuda)
                     print(f"Test Accuracy of model {count}: {test_accuracy:.2f}%")
                     print(f"Test loss of model {count}: {test_loss:.3f}")
                     # save the predictions into dataframe
@@ -280,7 +280,7 @@ def main(args):
                 for model in ensemble_ckpt_list:
                     count += 1
                     model = model.to("cpu")
-                    test_accuracy, test_loss, pred, prob, target_label = test_predictions_return(model, dataloaders["test"], args.cuda)
+                    test_accuracy, test_loss, pred, prob, target_label = test_predictions_return(model, dataloaders["valid"], args.cuda)
                     print(f"Test Accuracy of model {count}: {test_accuracy:.2f}%")
                     print(f"Test loss of model {count}: {test_loss:.3f}")
                     # save the predictions into dataframe
@@ -297,7 +297,7 @@ def main(args):
                 for model in ensemble_ckpt_list:
                     count += 1
                     model = model.to("cpu")
-                    test_accuracy, test_loss, pred, prob, target_label = test_predictions_return(model, dataloaders["test"], args.cuda)
+                    test_accuracy, test_loss, pred, prob, target_label = test_predictions_return(model, dataloaders["valid"], args.cuda)
                     print(f"Test Accuracy of model {count}: {test_accuracy:.2f}%")
                     print(f"Test loss of model {count}: {test_loss:.3f}")
                     # save the predictions into dataframe
@@ -310,7 +310,7 @@ def main(args):
         else:  # Single model learning
             print("Single model learning")
             model = model.to("cpu")
-            test_accuracy, test_loss, pred, prob, target_label = test_predictions_return(model, dataloaders["test"], args.cuda)
+            test_accuracy, test_loss, pred, prob, target_label = test_predictions_return(model, dataloaders["valid"], args.cuda)
             print(f"Test Accuracy: {test_accuracy:.2f}%")
             print(f"Test loss: {test_loss:.3f}")
             # save the predictions into dataframe
