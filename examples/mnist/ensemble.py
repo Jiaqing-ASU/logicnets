@@ -245,6 +245,11 @@ class AdaBoostMnistNeqModel(BaseEnsembleClassifier):
             ]
         )
         outputs = outputs / sum(self.alphas)
+        alphas_list = self.alphas.tolist()
+        # save the alphas to a file
+        print("Length of alphas: ", len(alphas_list))
+        with open("mnist/hdr/adaboost/alphas.txt", "w") as f:
+            f.write(str(alphas_list))
         return outputs
     
 
