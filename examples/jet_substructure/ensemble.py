@@ -389,4 +389,9 @@ class AdaBoostJetNeqModel(BaseEnsembleClassifier):
                 ]
             )
         outputs = outputs / sum(self.alphas)
+        alphas_list = self.alphas.tolist()
+        # save the alphas to a file
+        print("Length of alphas: ", len(alphas_list))
+        with open("jet_tagger/jsc/adaboost/alphas.txt", "w") as f:
+            f.write(str(alphas_list))
         return outputs

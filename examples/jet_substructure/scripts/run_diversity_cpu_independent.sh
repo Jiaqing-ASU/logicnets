@@ -16,7 +16,7 @@
 
 CUDA_DEVICE=$1
 
-
+#adaboost
 MODEL_NAME=adaboost_large_independent_ensemble_size32
 CONFIG=./model_ckpts/jet_substructure/adaboost_independent/adaboost_large_independent_ensemble_size32/hparams.yml
 CKPT=./model_ckpts/jet_substructure/adaboost_independent/adaboost_large_independent_ensemble_size32/last_ensemble_ckpt.pth
@@ -28,9 +28,54 @@ CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 diversity_cpu.py \
     --model_name $MODEL_NAME
 
 
+MODEL_NAME=adaboost_medium_independent_ensemble_size32
+CONFIG=./model_ckpts/jet_substructure/adaboost_independent/adaboost_medium_independent_ensemble_size32/hparams.yml
+CKPT=./model_ckpts/jet_substructure/adaboost_independent/adaboost_medium_independent_ensemble_size32/last_ensemble_ckpt.pth
+
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 diversity_cpu.py \
+    --evaluate \
+    --checkpoint $CKPT \
+    --config $CONFIG \
+    --model_name $MODEL_NAME
+
+
+MODEL_NAME=adaboost_small_independent_ensemble_size32
+CONFIG=./model_ckpts/jet_substructure/adaboost_independent/adaboost_small_independent_ensemble_size32/hparams.yml
+CKPT=./model_ckpts/jet_substructure/adaboost_independent/adaboost_small_independent_ensemble_size32/last_ensemble_ckpt.pth
+
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 diversity_cpu.py \
+    --evaluate \
+    --checkpoint $CKPT \
+    --config $CONFIG \
+    --model_name $MODEL_NAME
+
+
+#bagging
 MODEL_NAME=bagging_large_independent_ensemble_size32
 CONFIG=./model_ckpts/jet_substructure/bagging_independent/bagging_large_independent_ensemble_size32/hparams.yml
 CKPT=./model_ckpts/jet_substructure/bagging_independent/bagging_large_independent_ensemble_size32/last_ensemble_ckpt.pth
+
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 diversity_cpu.py \
+    --evaluate \
+    --checkpoint $CKPT \
+    --config $CONFIG \
+    --model_name $MODEL_NAME
+
+
+MODEL_NAME=bagging_medium_independent_ensemble_size32
+CONFIG=./model_ckpts/jet_substructure/bagging_independent/bagging_medium_independent_ensemble_size32/hparams.yml
+CKPT=./model_ckpts/jet_substructure/bagging_independent/bagging_medium_independent_ensemble_size32/last_ensemble_ckpt.pth
+
+CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 diversity_cpu.py \
+    --evaluate \
+    --checkpoint $CKPT \
+    --config $CONFIG \
+    --model_name $MODEL_NAME
+
+
+MODEL_NAME=bagging_small_independent_ensemble_size32
+CONFIG=./model_ckpts/jet_substructure/bagging_independent/bagging_small_independent_ensemble_size32/hparams.yml
+CKPT=./model_ckpts/jet_substructure/bagging_independent/bagging_small_independent_ensemble_size32/last_ensemble_ckpt.pth
 
 CUDA_VISIBLE_DEVICES=$CUDA_DEVICE python3 diversity_cpu.py \
     --evaluate \
