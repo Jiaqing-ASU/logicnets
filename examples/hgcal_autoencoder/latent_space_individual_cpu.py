@@ -29,10 +29,6 @@ import matplotlib.pyplot as plt
 from autoencoder import AutoencoderNeqModel, EncoderNeqModel
 from telescope_pt import telescopeMSE8x8
 
-from pyhessian import hessian
-from loss_landscapes_pinn import *
-from loss_landscapes_pinn.metrics import *
-
 def get_params(model_orig,  model_perb, direction, alpha):
     for m_orig, m_perb, d in zip(model_orig.parameters(), model_perb.parameters(), direction):
         # print("m_orig: ", m_orig.data.shape)
@@ -344,32 +340,6 @@ def main(args):
             break
         inputs, targets = x, x
 
-        POINTS = 1681
-        STEPS = 41
-        DIM = 2
-        START = -0.1
-        END = 0.1
-
-        # Generate the loss values array using BFS
-        # Create a coordinate array for loss values
-        loss_coordinates_list = []
-        pbar = tqdm(total=POINTS, desc="Generating 2-D coordinates in the subspace")
-        for i in range(STEPS):
-            for j in range(STEPS):
-                t = (i,j)
-                loss_coordinates_list.append(t)
-                pbar.update(1)
-        pbar.close()
-        loss_coordinates = np.array(loss_coordinates_list)
-        print(loss_coordinates.shape)
-        
-        # Create a data matrix to store loss values
-        data_matrix = np.empty([POINTS, 1], dtype=float)
-        # Fill array with initial value (e.g., -1)
-        data_matrix.fill(-1)
-        # print(data_matrix)
-        print(data_matrix.shape)
-
         # make the model a copy of the original model
         model.eval()
         model_experiment = copy.deepcopy(model)
@@ -391,69 +361,14 @@ def main(args):
             model_experiment.encoder_ensemble.append(encoder)
             model_experiment.eval()
 
-            model_perb = copy.deepcopy(model_experiment)
-            model_perb.eval()
-            model_current = copy.deepcopy(model_experiment)
-            model_current.eval()
-
-            hessian_comp = hessian(model, criterion, data=(inputs, targets), cuda=False)
-            top_eigenvalues, top_eigenvector = hessian_comp.eigenvalues(top_n=DIM)
-            print("Top eigenvalues: ", top_eigenvalues)
-            lams = np.linspace(START, END, STEPS).astype(np.float32)
+            # outputs = model_experiment(inputs)
+            encoder_outputs = model_experiment.encoder_ensemble[0](inputs)
+            # print("encoder_outputs: ", encoder_outputs)
+            print("encoder outputs size: ", encoder_outputs.size())
+            # save the encoder outputs to a CSV file
+            encoder_outputs_np = encoder_outputs.detach().numpy()
+            np.savetxt('latent_space_individual/' + str(args.experiment_name) + '_individual_'+ str(k+1) + '_encoder_outputs.csv', encoder_outputs_np, delimiter=",")
             
-            # calculate the hessian loss values
-            for j in tqdm(range(POINTS), desc="Calculating sampling loss values in the subspace"):
-                # adjust the model and fill with a loss with corresponding model parameters
-                next_pos = tuple(loss_coordinates[j])
-                model_current = copy.deepcopy(individual_checkpoint)
-                for i in range(DIM):
-                    model_perb = get_params(model_current, model_perb, top_eigenvector[i], lams[next_pos[i]])
-                    model_current = copy.deepcopy(model_perb)
-                model_current.eval()
-                # calculate the loss value
-                inputs_hat = model_current(inputs)
-                loss = criterion(inputs_hat, targets)
-                data_matrix[j] = loss.item()
-                # print("Loss value: ", data_matrix[j])
-
-            ###############################################################################
-            # Save the loss values and plot the loss landscape
-            ###############################################################################
-
-            # save the loss values
-            np.save('loss_landscapes_individual/' + str(args.experiment_name) + '_individual_'+ str(k) + '_hessian_loss_landscape.npy', data_matrix)
-
-            # plot the loss values
-            X, Y = np.meshgrid(np.linspace(START, END, STEPS), np.linspace(START, END, STEPS))
-            Z = data_matrix.reshape(STEPS, STEPS)
-            fig, ax = plt.subplots()
-            ax.contour(X, Y, Z, levels=80)
-            plt.title('Hessian Loss landscape contour of the individual ' + str(k) + ' model')
-            plt.savefig('loss_landscapes_individual/' + str(args.experiment_name) + '_individual_'+ str(k) + '_hessian_loss_landscape.png')
-
-             # plot the 2D loss values in 3D
-            fig = plt.figure()
-            ax = plt.axes(projection='3d')
-            X = np.array([[j for j in range(STEPS)] for i in range(STEPS)])
-            Y = np.array([[i for _ in range(STEPS)] for i in range(STEPS)])
-            data_matrix_reshape = data_matrix.reshape(STEPS, STEPS)
-            ax.plot_surface(X, Y, data_matrix_reshape, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
-
-            cset = ax.contourf(X, Y, data_matrix_reshape, zdir='z', offset=3, cmap=cm.coolwarm)
-            cset = ax.contourf(X, Y, data_matrix_reshape, zdir='x', offset=40, cmap=cm.coolwarm)
-            cset = ax.contourf(X, Y, data_matrix_reshape, zdir='y', offset=0, cmap=cm.coolwarm)
-
-            ax.set_xlabel('X')
-            ax.set_xlim(0, STEPS)
-            ax.set_ylabel('Y')
-            ax.set_ylim(0, STEPS)
-            ax.set_zlabel('loss_data_fin')
-            ax.set_zlim(min(data_matrix), max(data_matrix))
-            ax.set_title('Hessian Loss landscape surface of the individual ' + str(k) + ' model')
-
-            # save plot to file
-            plt.savefig('loss_landscapes_individual/' + str(args.experiment_name) + '_individual_'+ str(k) + '_hessian_loss_landscape_surface.png')
-
 if __name__ == "__main__":
     parser = ArgumentParser()
     # Dataset args
