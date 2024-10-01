@@ -92,7 +92,7 @@ def test_predictions_return(model, dataset_loader, cuda):
         return accuracy, avg_roc_auc, accLoss, prob, pred, target_label
 
 
-def test_predictions_return_shared_layer(model, count, input_length, shared_input_layer, shared_output_layer, dataset_loader, cuda):
+def test_predictions_return_shared_layer(model, dataset_loader, cuda):
     # Configure criterion
     criterion = nn.CrossEntropyLoss()
     with torch.no_grad():
@@ -101,41 +101,64 @@ def test_predictions_return_shared_layer(model, count, input_length, shared_inpu
         golden_ref = None
         correct = 0
         accLoss = 0.0
+        # get shared input layer
+        shared_input_layer = model.ensemble[0]
+        # get shared output layer
+        shared_output_layer = model.ensemble[-1]
+        # get individual models
+        ensemble_ckpt_list = model.ensemble[1:-1]
+        print("Number of ensemble models", len(ensemble_ckpt_list))
+        input_length = model.input_length
+        prob_ensemble_list = []
+        pred_ensemble_list = []
+
         for batch_idx, (data, target) in enumerate(dataset_loader):
-            if cuda:
-                data, target = data.cuda(), target.cuda()
-            input_ensemble = shared_input_layer(data)
-            start = (count - 1) * input_length
-            end = count * input_length
-            output_ensemble = model(input_ensemble[:, start:end])
-            prob_ensemble = F.softmax(output_ensemble, dim=1)
-            pred_ensemble = output_ensemble.detach().max(1, keepdim=True)[1]
-
-            output = model(data)
-            loss = criterion(output, torch.max(target, 1)[1])
-            accLoss += loss.detach() * len(data)
-            prob = F.softmax(output, dim=1)
-            pred = output.detach().max(1, keepdim=True)[1]
-            target_label = torch.max(target.detach(), 1, keepdim=True)[1]
-            curCorrect = pred.eq(target_label).long().sum()
-            curAcc = 100.0 * curCorrect / len(data)
-            correct += curCorrect
             if batch_idx == 0:
-                entire_prob = prob
-                golden_ref = target_label
-            else:
-                entire_prob = torch.cat((entire_prob, prob), dim=0)
-                golden_ref = torch.cat((golden_ref, target_label))
-        accLoss /= len(dataset_loader.dataset)
-        accuracy = 100 * float(correct) / len(dataset_loader.dataset)
-        avg_roc_auc = roc_auc_score(
-            golden_ref.detach().cpu().numpy(),
-            entire_prob.detach().cpu().numpy(),
-            average="macro",
-            multi_class="ovr",
-        )
-        return accuracy, accLoss, prob, pred, target_label, prob_ensemble, pred_ensemble
+                count = 0
+                output_data = torch.Tensor()
+                for ensemble_ckpt in ensemble_ckpt_list:
+                    count += 1
+                    with torch.no_grad():
+                        ensemble_ckpt.eval()
+                    if cuda:
+                        data, target = data.cuda(), target.cuda()
+                        ensemble_ckpt.cuda()
+                    input_ensemble = shared_input_layer(data)
+                    # print("input_ensemble shape", input_ensemble.shape)
+                    start = (count - 1) * input_length
+                    end = count * input_length
+                    output_ensemble = ensemble_ckpt(input_ensemble[:, start:end])
+                    # print("output_ensemble shape", output_ensemble.shape)
+                    if count == 1:
+                        output_data = output_ensemble
+                    else:
+                        # print("output_data shape", output_data.shape)
+                        # print("output_ensemble shape", output_ensemble.shape)
+                        output_data = torch.cat((output_data, output_ensemble), dim=1)
+                        # print("output_data shape", output_data.shape)
+                    prob_ensemble = F.softmax(output_ensemble, dim=1)
+                    pred_ensemble = output_ensemble.detach().max(1, keepdim=True)[1]
+                    prob_ensemble_list.append(prob_ensemble)
+                    pred_ensemble_list.append(pred_ensemble)
 
+                # print("output_data shape", output_data.shape)
+                output = shared_output_layer(output_data)
+                loss = criterion(output, torch.max(target, 1)[1])
+                accLoss += loss.detach() * len(data)
+                prob = F.softmax(output, dim=1)
+                pred = output.detach().max(1, keepdim=True)[1]
+                target_label = torch.max(target.detach(), 1, keepdim=True)[1]
+                curCorrect = pred.eq(target_label).long().sum()
+                correct += curCorrect
+                if batch_idx == 0:
+                    entire_prob = prob
+                    golden_ref = target_label
+                else:
+                    entire_prob = torch.cat((entire_prob, prob), dim=0)
+                    golden_ref = torch.cat((golden_ref, target_label))
+                accLoss /= len(dataset_loader.dataset)
+            
+        return prob, pred, target_label, prob_ensemble_list, pred_ensemble_list
 
 def train(model, datasets, config, cuda=False, log_dir="./jsc", sampler=None):
     # Create data loaders for training and inference:

@@ -210,24 +210,21 @@ def main(args):
         if "ensemble_method" in config:
             if config["ensemble_method"] == "averaging":
                 print("Averaging ensemble method")
-                # get shared input layer
-                shared_input_layer = model.ensemble[0]
-                # get shared output layer
-                shared_output_layer = model.ensemble[-1]
-                # get individual models
-                ensemble_ckpt_list = model.ensemble[1:-1]
-                count = 0
-                input_length = model.input_length
-                for model in ensemble_ckpt_list:
-                    count += 1
-                    model = model.to("cpu")
-                    test_accuracy, test_loss, prob, pred, target_label, prob_ensemble, pred_ensemble = test_predictions_return_shared_layer(model, count, input_length, shared_input_layer, shared_output_layer, test_loader, args.cuda)
-                    print(f"Test Accuracy of model {count}: {test_accuracy:.2f}%")
-                    print(f"Test loss of model {count}: {test_loss:.3f}")
-                    # save the predictions into dataframe
-                    df = pd.DataFrame(prob_ensemble)
-                    df['pred_ensemble'] = pred_ensemble
-                    df.to_csv(os.path.join(experiment_dir, f"averaging/{args.model_name}_model_{count}_predictions.csv"), index=False)
+                prob, pred, target_label, prob_ensemble_list, pred_ensemble_list = test_predictions_return_shared_layer(model, test_loader, args.cuda)
+                print("Length of prob_ensemble_list: ", len(prob_ensemble_list))
+                print("Length of pred_ensemble_list: ", len(pred_ensemble_list))
+                
+                for i in range(len(prob_ensemble_list)):
+                    df = pd.DataFrame(prob_ensemble_list[i])
+                    df['pred_ensemble'] = pred_ensemble_list[i]
+                    df['target_label'] = target_label
+                    df.to_csv(os.path.join(experiment_dir, f"averaging/{args.model_name}_model_{i}_predictions.csv"), index=False)
+                args.model_name = args.model_name.replace("_output_","_shared_output_")
+                for i in range(len(prob_ensemble_list)):
+                    df2 = pd.DataFrame(prob)
+                    df2['pred'] = pred
+                    df2['target_label'] = target_label
+                    df2.to_csv(os.path.join(experiment_dir, f"averaging/{args.model_name}_model_{i}_predictions.csv"), index=False)
             else:
                 raise ValueError(f"Unknown ensemble method: {config['ensemble_method']}")
         else:  # Single model learning
@@ -240,7 +237,7 @@ def main(args):
             df = pd.DataFrame(prob)
             df['pred'] = pred
             df['target_label'] = target_label
-            df.to_csv(os.path.join(experiment_dir, f"single/{args.model_name}_model_{count}_predictions.csv"), index=False)
+            df.to_csv(os.path.join(experiment_dir, f"single/{args.model_name}_predictions.csv"), index=False)
 
 
 if __name__ == "__main__":
