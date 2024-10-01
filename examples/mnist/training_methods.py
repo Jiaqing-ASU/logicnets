@@ -34,6 +34,29 @@ def test(model, dataset_loader, cuda):
     return accuracy, accLoss
 
 
+def test_predictions_return(model, dataset_loader, cuda):
+    # Configure criterion
+    criterion = nn.CrossEntropyLoss()
+    with torch.no_grad():
+        model.eval()
+        correct = 0
+        accLoss = 0.0
+        for _, (data, target) in enumerate(dataset_loader):
+            if cuda:
+                data, target = data.cuda(), target.cuda()
+            output = model(data)
+            loss = criterion(output, target)
+            pred = output.detach().max(1, keepdim=True)[1]
+            prob = nn.functional.softmax(output, dim=1)
+            target_label = target.detach().unsqueeze(1)
+            curCorrect = pred.eq(target_label).long().sum()
+            accLoss += loss.detach() * len(data)
+            correct += curCorrect
+        accuracy = 100 * float(correct) / len(dataset_loader.dataset)
+        accLoss /= len(dataset_loader.dataset)
+    return accuracy, accLoss, pred, prob, target_label
+
+
 def train(model, datasets, config, cuda=False, log_dir="./mnist", sampler=None):
     # Create data loaders for training and inference:
     train_loader = DataLoader(

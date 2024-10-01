@@ -2,3 +2,6 @@
 **/averaging/**/*.pth
 **/bagging/**/*.pth
 **/adaboost/**/*.pth
+
+# Large files
+model_ckpts/
