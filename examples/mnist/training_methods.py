@@ -57,6 +57,67 @@ def test_predictions_return(model, dataset_loader, cuda):
     return accuracy, accLoss, pred, prob, target_label
 
 
+def test_predictions_return_shared_layer(model, dataset_loader, cuda):
+    # Configure criterion
+    criterion = nn.CrossEntropyLoss()
+    with torch.no_grad():
+        model.eval()
+        correct = 0
+        accLoss = 0.0
+        # get shared input layer
+        shared_input_layer = model.ensemble[0]
+        # get shared output layer
+        shared_output_layer = model.ensemble[-1]
+        # get individual models
+        ensemble_ckpt_list = model.ensemble[1:-1]
+        print("Number of ensemble models", len(ensemble_ckpt_list))
+        input_length = model.input_length
+        prob_ensemble_list = []
+        pred_ensemble_list = []
+
+        for batch_idx, (data, target) in enumerate(dataset_loader):
+            if batch_idx == 0:
+                count = 0
+                output_data  = torch.Tensor()
+                for ensemble_ckpt in ensemble_ckpt_list:
+                    count += 1
+                    with torch.no_grad():
+                        ensemble_ckpt.eval()
+                    if cuda:
+                        data, target = data.cuda(), target.cuda()
+                        ensemble_ckpt.cuda()
+                    input_ensemble = shared_input_layer(data)
+                    start = (count - 1) * input_length
+                    end = count * input_length
+                    output_ensemble = ensemble_ckpt(input_ensemble[:, start:end])
+                    # print("output_ensemble shape", output_ensemble.shape)
+                    if count == 1:
+                        output_data = output_ensemble
+                    else:
+                        # print("output_data shape", output_data.shape)
+                        # print("output_ensemble shape", output_ensemble.shape)
+                        output_data = torch.cat((output_data, output_ensemble), dim=1)
+                        # print("output_data shape", output_data.shape)
+                    prob_ensemble = nn.functional.softmax(output_ensemble, dim=1)
+                    pred_ensemble = output_ensemble.detach().max(1, keepdim=True)[1]
+                    prob_ensemble_list.append(prob_ensemble)
+                    pred_ensemble_list.append(pred_ensemble)
+
+                output = shared_output_layer(output_data)
+                prob = nn.functional.softmax(output, dim=1)
+                output = output.view(-1, model.num_models, model.output_length)
+                output = output.sum(dim=1)
+                loss = criterion(output, target)
+                pred = output.detach().max(1, keepdim=True)[1]
+                target_label = target.detach().unsqueeze(1)
+                curCorrect = pred.eq(target_label).long().sum()
+                accLoss += loss.detach() * len(data)
+                correct += curCorrect
+            accuracy = 100 * float(correct) / len(dataset_loader.dataset)
+            accLoss /= len(dataset_loader.dataset)
+    return pred, prob, target_label, prob_ensemble_list, pred_ensemble_list
+
+
 def train(model, datasets, config, cuda=False, log_dir="./mnist", sampler=None):
     # Create data loaders for training and inference:
     train_loader = DataLoader(

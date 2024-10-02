@@ -145,7 +145,7 @@ def test_predictions_return_shared_layer(model, dataset_loader, cuda):
                 output = shared_output_layer(output_data)
                 prob = F.softmax(output, dim=1)
                 output = output.view(-1, model.num_models, model.output_length)
-                output = output .sum(dim=1)
+                output = output.sum(dim=1)
                 loss = criterion(output, torch.max(target, 1)[1])
                 accLoss += loss.detach() * len(data)
                 # prob = F.softmax(output, dim=1)
