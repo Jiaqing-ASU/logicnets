@@ -220,8 +220,15 @@ def main(args):
                     df['target_label'] = target_label
                     df.to_csv(os.path.join(experiment_dir, f"averaging/{args.model_name}_model_{i}_predictions.csv"), index=False)
                 args.model_name = args.model_name.replace("_output_","_shared_output_")
-                for i in range(len(prob_ensemble_list)):
-                    df2 = pd.DataFrame(prob)
+                # Define how many parts you want to split into
+                num_parts = len(prob_ensemble_list)
+                print("num_parts: ", num_parts)
+                # Calculate the number of columns per tensor
+                columns_per_part = prob.shape[1] // num_parts
+                # Split the tensor into parts
+                prob = [prob[:, i*columns_per_part:(i+1)*columns_per_part] for i in range(num_parts)]
+                for i, t in enumerate(prob):
+                    df2 = pd.DataFrame(t)
                     df2['pred'] = pred
                     df2['target_label'] = target_label
                     df2.to_csv(os.path.join(experiment_dir, f"averaging/{args.model_name}_model_{i}_predictions.csv"), index=False)

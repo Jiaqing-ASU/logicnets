@@ -143,6 +143,7 @@ def test_predictions_return_shared_layer(model, dataset_loader, cuda):
 
                 # print("output_data shape", output_data.shape)
                 output = shared_output_layer(output_data)
+                # output = model(data)
                 loss = criterion(output, torch.max(target, 1)[1])
                 accLoss += loss.detach() * len(data)
                 prob = F.softmax(output, dim=1)
