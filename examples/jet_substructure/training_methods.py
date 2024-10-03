@@ -124,44 +124,36 @@ def test_predictions_return_shared_layer(model, dataset_loader, cuda):
                         data, target = data.cuda(), target.cuda()
                         ensemble_ckpt.cuda()
                     input_ensemble = shared_input_layer(data)
-                    # print("input_ensemble shape", input_ensemble.shape)
                     start = (count - 1) * input_length
                     end = count * input_length
                     output_ensemble = ensemble_ckpt(input_ensemble[:, start:end])
-                    # print("output_ensemble shape", output_ensemble.shape)
                     if count == 1:
                         output_data = output_ensemble
                     else:
-                        # print("output_data shape", output_data.shape)
-                        # print("output_ensemble shape", output_ensemble.shape)
                         output_data = torch.cat((output_data, output_ensemble), dim=1)
-                        # print("output_data shape", output_data.shape)
                     prob_ensemble = F.softmax(output_ensemble, dim=1)
                     pred_ensemble = output_ensemble.detach().max(1, keepdim=True)[1]
                     prob_ensemble_list.append(prob_ensemble)
                     pred_ensemble_list.append(pred_ensemble)
 
-                # print("output_data shape", output_data.shape)
                 output = shared_output_layer(output_data)
-                prob = F.softmax(output, dim=1)
                 output = output.view(-1, model.num_models, model.output_length)
-                output = output.sum(dim=1)
-                loss = criterion(output, torch.max(target, 1)[1])
-                accLoss += loss.detach() * len(data)
-                # prob = F.softmax(output, dim=1)
-                pred = output.detach().max(1, keepdim=True)[1]
+                print("total output shape", output.shape)
+                output_list = []
+                prob_list = []
+                pred_list = []
+                for i in range(model.num_models):
+                    output_list.append(output[:, i, :])
+                    print("output shape", output_list[i].shape)
+                    prob = F.softmax(output_list[i], dim=1)
+                    prob_list.append(prob)
+                    print("prob shape", prob.shape)
+                    pred = output_list[i].detach().max(1, keepdim=True)[1]
+                    pred_list.append(pred)
+                    print("pred shape", pred.shape)
                 target_label = torch.max(target.detach(), 1, keepdim=True)[1]
-                curCorrect = pred.eq(target_label).long().sum()
-                correct += curCorrect
-                if batch_idx == 0:
-                    entire_prob = prob
-                    golden_ref = target_label
-                else:
-                    entire_prob = torch.cat((entire_prob, prob), dim=0)
-                    golden_ref = torch.cat((golden_ref, target_label))
-                accLoss /= len(dataset_loader.dataset)
             
-        return prob, pred, target_label, prob_ensemble_list, pred_ensemble_list
+        return prob_list, pred_list, target_label, prob_ensemble_list, pred_ensemble_list
 
 def train(model, datasets, config, cuda=False, log_dir="./jsc", sampler=None):
     # Create data loaders for training and inference:

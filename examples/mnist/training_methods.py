@@ -90,32 +90,31 @@ def test_predictions_return_shared_layer(model, dataset_loader, cuda):
                     start = (count - 1) * input_length
                     end = count * input_length
                     output_ensemble = ensemble_ckpt(input_ensemble[:, start:end])
-                    # print("output_ensemble shape", output_ensemble.shape)
                     if count == 1:
                         output_data = output_ensemble
                     else:
-                        # print("output_data shape", output_data.shape)
-                        # print("output_ensemble shape", output_ensemble.shape)
                         output_data = torch.cat((output_data, output_ensemble), dim=1)
-                        # print("output_data shape", output_data.shape)
                     prob_ensemble = nn.functional.softmax(output_ensemble, dim=1)
                     pred_ensemble = output_ensemble.detach().max(1, keepdim=True)[1]
                     prob_ensemble_list.append(prob_ensemble)
                     pred_ensemble_list.append(pred_ensemble)
-
                 output = shared_output_layer(output_data)
-                prob = nn.functional.softmax(output, dim=1)
                 output = output.view(-1, model.num_models, model.output_length)
-                output = output.sum(dim=1)
-                loss = criterion(output, target)
-                pred = output.detach().max(1, keepdim=True)[1]
+                print("total output shape", output.shape)
+                output_list = []
+                prob_list = []
+                pred_list = []
+                for i in range(model.num_models):
+                    output_list.append(output[:, i, :])
+                    print("output shape", output_list[i].shape)
+                    prob = nn.functional.softmax(output_list[i], dim=1)
+                    prob_list.append(prob)
+                    print("prob shape", prob.shape)
+                    pred = output_list[i].detach().max(1, keepdim=True)[1]
+                    pred_list.append(pred)
+                    print("pred shape", pred.shape)
                 target_label = target.detach().unsqueeze(1)
-                curCorrect = pred.eq(target_label).long().sum()
-                accLoss += loss.detach() * len(data)
-                correct += curCorrect
-            accuracy = 100 * float(correct) / len(dataset_loader.dataset)
-            accLoss /= len(dataset_loader.dataset)
-    return pred, prob, target_label, prob_ensemble_list, pred_ensemble_list
+        return pred_list, prob_list, target_label, prob_ensemble_list, pred_ensemble_list
 
 
 def train(model, datasets, config, cuda=False, log_dir="./mnist", sampler=None):

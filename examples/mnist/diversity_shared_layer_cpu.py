@@ -203,9 +203,12 @@ def main(args):
         if "ensemble_method" in config:
             if config["ensemble_method"] == "averaging":
                 print("Averaging ensemble method")
-                pred, prob, target_label, prob_ensemble_list, pred_ensemble_list = test_predictions_return_shared_layer(model, valid_loader, args.cuda)
+                pred_list, prob_list, target_label, prob_ensemble_list, pred_ensemble_list = test_predictions_return_shared_layer(model, valid_loader, args.cuda)
                 print("Length of prob_ensemble_list: ", len(prob_ensemble_list))
                 print("Length of pred_ensemble_list: ", len(pred_ensemble_list))
+                print("Length of pred_list: ", len(pred_list))
+                print("Length of prob_list: ", len(prob_list))
+
                 args.experiment_name = args.experiment_name.replace("_ensemble_","_shared_input_ensemble_")
                 for i in range(len(prob_ensemble_list)):
                     df = pd.DataFrame(prob_ensemble_list[i])
@@ -213,16 +216,9 @@ def main(args):
                     df['target_label'] = target_label
                     df.to_csv(os.path.join(experiment_dir, f"{args.experiment_name}_model_{i}_predictions.csv"), index=False)
                 args.experiment_name = args.experiment_name.replace("_shared_input_ensemble_","_shared_input_shared_output_ensemble_")
-                # Define how many parts you want to split into
-                num_parts = len(prob_ensemble_list)
-                print("num_parts: ", num_parts)
-                # Calculate the number of columns per tensor
-                columns_per_part = prob.shape[1] // num_parts
-                # Split the tensor into parts
-                prob = [prob[:, i*columns_per_part:(i+1)*columns_per_part] for i in range(num_parts)]
-                for i, t in enumerate(prob):
-                    df2 = pd.DataFrame(t)
-                    df2['pred'] = pred
+                for i in range(len(prob_list)):
+                    df2 = pd.DataFrame(prob_list[i])
+                    df2['pred'] = pred_list[i]
                     df2['target_label'] = target_label
                     df2.to_csv(os.path.join(experiment_dir, f"{args.experiment_name}_model_{i}_predictions.csv"), index=False)
             else:
